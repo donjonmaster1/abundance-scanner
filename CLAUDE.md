@@ -172,6 +172,21 @@ code paths.
   (`PRICING` dict) are standard (non-introductory) per-1M-token rates,
   checked 2026-08-05 — re-verify against current Anthropic pricing if this
   file is being revisited long after that date.
+- **`src/publish/email_digest.py`** (added 2026-08-05) — emails the same
+  candidates that go into the markdown digest, as HTML, via the Resend API
+  (`https://api.resend.com/emails`). Recipients come from `subscribers:` in
+  `config/subscribers.yaml` — a plain list of addresses committed to this
+  (private) repo; add/remove addresses by editing that file directly. Sent
+  as a single Resend call with `to` set to `EMAIL_FROM` itself and the real
+  recipient list in `bcc`, so subscribers never see each other's addresses.
+  Requires `RESEND_API_KEY` and `EMAIL_FROM` — **not yet configured as of
+  2026-08-05** (no Resend account exists yet), so `send_digest_email()`
+  currently no-ops with a printed warning every run. This is by design
+  (best-effort, never raises) so a missing/broken email step can't fail the
+  digest/seen-state/cost-log parts of the run that already succeeded.
+  Set up a Resend account + verified sending domain, then add
+  `RESEND_API_KEY`/`EMAIL_FROM` as both local `.env` values and GitHub repo
+  secrets, to make sending actually work.
 
 ## Repo structure (actual)
 
@@ -184,7 +199,8 @@ abundance-scanner/
 ├── requirements.txt
 ├── config/
 │   ├── keywords.yaml
-│   └── jurisdictions.yaml      # 27 verified Legistar client codes
+│   ├── jurisdictions.yaml      # 27 verified Legistar client codes
+│   └── subscribers.yaml        # digest email mailing list (plain addresses)
 ├── src/
 │   ├── models.py                # Candidate dataclass — the shared pipeline object
 │   ├── cost_log.py
@@ -199,7 +215,8 @@ abundance-scanner/
 │   │   ├── triage.py            # Haiku pass
 │   │   └── summarize.py         # Sonnet pass
 │   └── publish/
-│       └── digest.py
+│       ├── digest.py
+│       └── email_digest.py      # Resend email delivery, not yet configured
 ├── state/
 │   ├── seen.sqlite               # committed — cross-run dedup state
 │   └── cost_log.csv              # committed — running spend log
@@ -207,7 +224,7 @@ abundance-scanner/
 │   └── YYYY-MM-DD.md             # one per run date
 └── .github/
     └── workflows/
-        └── weekly_scan.yml       # Monday 13:00 UTC cron + workflow_dispatch
+        └── weekly_scan.yml       # Saturday 16:00 UTC cron + workflow_dispatch
 ```
 
 ## Running it
@@ -257,4 +274,9 @@ free on a public repo (unlimited Actions minutes) and trivially within the
   output should be capped or re-ranked per jurisdiction if this becomes a
   recurring pattern — not implemented, no strong opinion yet on whether it's
   actually a problem versus just how the data looks.
-- **Email delivery / static site (v2)**: out of scope for v1, not started.
+- **Email delivery**: code is in place (`src/publish/email_digest.py`,
+  `config/subscribers.yaml`) but there's no Resend account yet, so no email
+  has actually been sent — `RESEND_API_KEY`/`EMAIL_FROM` need to be created
+  and set (locally in `.env` and as GitHub repo secrets) before this does
+  anything. See Stage 3 notes above.
+- **Static site (v2)**: out of scope, not started.

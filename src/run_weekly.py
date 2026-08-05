@@ -15,6 +15,7 @@ from src.filter.summarize import summarize_all
 from src.filter.triage import triage_batch
 from src.models import Candidate
 from src.publish.digest import write_digest
+from src.publish.email_digest import send_digest_email
 from src.seen_state import SeenStore
 from src.sources import federal_register, legiscan, legistar
 
@@ -63,6 +64,7 @@ def run(days: int = 7, dry_run: bool = False) -> None:
 
         if not keyword_survivors:
             write_digest([], run_date)
+            send_digest_email([], run_date)
             print("[run_weekly] no candidates this week; empty digest written")
             return
 
@@ -82,6 +84,7 @@ def run(days: int = 7, dry_run: bool = False) -> None:
 
         digest_path = write_digest(triage_survivors, run_date)
         print(f"[run_weekly] digest written to {digest_path}")
+        send_digest_email(triage_survivors, run_date)
 
         # Mark every keyword survivor seen (not just triage winners) so rejected
         # items aren't re-spent on next week.

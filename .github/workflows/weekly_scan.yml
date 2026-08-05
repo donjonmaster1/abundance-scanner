@@ -2,8 +2,8 @@ name: Weekly Abundance Wins Scan
 
 on:
   schedule:
-    # Mondays 13:00 UTC (~9am ET / 6am PT)
-    - cron: "0 13 * * 1"
+    # Saturdays 16:00 UTC (~12pm ET / 9am PT)
+    - cron: "0 16 * * 6"
   workflow_dispatch: {}
 
 permissions:
@@ -26,6 +26,8 @@ jobs:
         env:
           LEGISCAN_API_KEY: ${{ secrets.LEGISCAN_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
         run: python -m src.run_weekly
 
       - name: Commit digest, seen-state, and cost log
