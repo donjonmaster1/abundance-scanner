@@ -1,0 +1,84 @@
+# Pre-filter keyword list, tagged by Abundance category.
+# Matching is case-insensitive substring/word matching against title + abstract/summary
+# text (see src/filter/keyword_filter.py). Keep this list broad early on; tighten based
+# on false-positive rate observed from Haiku triage (see CLAUDE.md "Open questions").
+#
+# A document matches if it contains ANY keyword from ANY category. The matched
+# category/categories are attached to the candidate for downstream triage/summary.
+
+state_capacity:
+  - permitting reform
+  - permit reform
+  - streamlined permitting
+  - expedited permitting
+  - agency staffing
+  - civil service reform
+  - procurement reform
+  - contracting reform
+  - occupational licensing
+  - licensing reform
+  - license reciprocity
+  - regulatory sandbox
+  - environmental review reform
+  - NEPA reform
+  - CEQA reform
+  - permit streamlining
+  - one-stop permitting
+  - shot clock
+  - agency modernization
+
+housing_supply:
+  - zoning reform
+  - upzoning
+  - rezoning
+  - accessory dwelling unit
+  - ADU legalization
+  - parking minimum
+  - parking mandate
+  - single-family zoning
+  - missing middle housing
+  - by-right approval
+  - by-right development
+  - density bonus
+  - inclusionary zoning
+  - housing permitting
+  - housing streamlining
+  - transit-oriented development
+  - multifamily zoning
+  - minimum lot size
+  - floor area ratio
+  - housing supply
+  - starter homes act
+  - builder's remedy
+  - affordable housing production
+
+energy_supply:
+  - transmission approval
+  - transmission siting
+  - interconnection reform
+  - interconnection queue
+  - siting reform
+  - power plant siting
+  - clean energy siting
+  - grid interconnection
+  - energy permitting
+  - renewable energy siting
+  - nuclear licensing
+  - geothermal permitting
+  - transmission line permitting
+  - FERC order
+  - generator interconnection
+
+service_provision:
+  - agency modernization
+  - digital services
+  - service delivery
+  - benefits access
+  - online application
+  - customer experience
+  - case processing time
+  - backlog reduction
+  - administrative burden
+  - reduces paperwork burden
+  - cuts red tape
+  - form simplification

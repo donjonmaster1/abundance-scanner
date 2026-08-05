@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import sys; print\\(sys.executable\\)\")",
+      "WebSearch",
+      "Skill(claude-api)",
+      "Skill(claude-api:*)",
+      "Bash(curl -s \"https://www.federalregister.gov/api/v1/documents.json?conditions%5Btype%5D%5B%5D=RULE&conditions%5Btype%5D%5B%5D=NOTICE&conditions%5Bpublication_date%5D%5Bgte%5D=2026-07-29&per_page=5&order=newest&fields%5B%5D=title&fields%5B%5D=abstract&fields%5B%5D=html_url&fields%5B%5D=publication_date&fields%5B%5D=agencies&fields%5B%5D=type&fields%5B%5D=document_number\" -m 15)",
+      "Bash(curl -s \"https://webapi.legistar.com/v1/sfgov/matters?%24filter=MatterIntroDate+ge+datetime%272026-07-01%27&%24top=3\" -m 15)",
+      "Bash(curl -s \"https://webapi.legistar.com/v1/sfgov/matters?%24top=2\" -m 15)",
+      "Bash(curl -s \"https://webapi.legistar.com/v1/sfgov/matters?%24orderby=MatterLastModifiedUtc+desc&%24top=2\" -m 15)",
+      "Bash(curl -s \"https://webapi.legistar.com/v1/sfgov/matters?%24filter=MatterLastModifiedUtc+ge+datetime%272026-07-29%27&%24top=5&%24orderby=MatterLastModifiedUtc+desc\" -m 15)",
+      "Bash(curl -s \"https://webapi.legistar.com/v1/sfgov/matters?%24orderby=MatterLastModifiedUtc+desc&%24top=3\" -m 15)",
+      "Bash(curl -s \"https://webapi.legistar.com/v1/sfgov/matters?%24filter=MatterLastModifiedUtc+ge+datetime%272025-01-01%27&%24top=3\" -m 15)",
+      "Bash(python -m pip install -q -r requirements.txt)",
+      "Bash(python -c ' *)",
+      "Bash(python -m src.run_weekly --dry-run --days 7)",
+      "Bash(python -m py_compile src/*.py src/filter/*.py src/sources/*.py src/publish/*.py)",
+      "Bash(xargs rm -rf)",
+      "Bash(python -m src.run_weekly --days 7)",
+      "Bash(python -m src.run_weekly --days 30)",
+      "Bash(python -m py_compile src/sources/legistar.py src/sources/legiscan.py)",
+      "Bash(gh auth *)",
+      "PowerShell(gh --version)",
+      "PowerShell(gh auth status)",
+      "PowerShell(winget --version 2>&1; Write-Output \"---\"; where.exe gh 2>&1; Write-Output \"---\"; Test-Path \"$env:LOCALAPPDATA\\\\GitHubCLI\")",
+      "PowerShell(winget install --id GitHub.cli -e --source winget --accept-package-agreements --accept-source-agreements)",
+      "PowerShell($env:Path = [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"Machine\"\\) + \";\" + [System.Environment]::GetEnvironmentVariable\\(\"Path\",\"User\"\\); gh --version)",
+      "PowerShell(gh auth login --help)",
+      "PowerShell(& \"C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe\" auth login --hostname github.com --git-protocol https --web)",
+      "PowerShell(& \"C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe\" auth status)",
+      "Bash(git init *)",
+      "Bash(git add *)"
+    ]
+  }
+}

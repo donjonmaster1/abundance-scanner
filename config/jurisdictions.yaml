@@ -1,0 +1,124 @@
+# Curated Legistar client codes for Tier 2 municipal sourcing (src/sources/legistar.py).
+#
+# `code` is the Legistar client subdomain, i.e. https://{code}.legistar.com and the Web
+# API base https://webapi.legistar.com/v1/{code}/. Every entry below was verified live
+# against the Web API `bodies` endpoint on 2026-08-05 (returns a JSON array, not an
+# "InSite setting not set up" error) — do not add a code without the same check, since
+# legistar.com resolves 200 for *any* subdomain regardless of validity.
+#
+# Starter set: DC-area jurisdictions + a geographically representative national sample,
+# per CLAUDE.md's open question ("which ~20-50 cities/counties matter most?"). Expand
+# over time — good candidates are places actively passing zoning/permitting/energy-siting
+# reform, not just population-largest cities.
+
+dc_area:
+  - code: montgomerycountymd
+    name: Montgomery County
+    state: MD
+    type: county
+  - code: princegeorgescountymd
+    name: Prince George's County
+    state: MD
+    type: county
+  - code: alexandria
+    name: City of Alexandria
+    state: VA
+    type: city
+  - code: richmondva
+    name: City of Richmond
+    state: VA
+    type: city
+
+national_sample:
+  - code: sfgov
+    name: San Francisco
+    state: CA
+    type: city_county
+  - code: oakland
+    name: Oakland
+    state: CA
+    type: city
+  - code: sacramento
+    name: Sacramento
+    state: CA
+    type: city
+  - code: longbeach
+    name: Long Beach
+    state: CA
+    type: city
+  - code: fresno
+    name: Fresno
+    state: CA
+    type: city
+  - code: stockton
+    name: Stockton
+    state: CA
+    type: city
+  - code: seattle
+    name: Seattle
+    state: WA
+    type: city
+  - code: denver
+    name: Denver
+    state: CO
+    type: city_county
+  - code: phoenix
+    name: Phoenix
+    state: AZ
+    type: city
+  - code: sanantonio
+    name: San Antonio
+    state: TX
+    type: city
+  - code: nashville
+    name: Metro Nashville-Davidson
+    state: TN
+    type: metro
+  - code: louisville
+    name: Louisville-Jefferson County Metro
+    state: KY
+    type: metro
+  - code: columbus
+    name: Columbus
+    state: OH
+    type: city
+  - code: pittsburgh
+    name: Pittsburgh
+    state: PA
+    type: city
+  - code: detroit
+    name: Detroit
+    state: MI
+    type: city
+  - code: milwaukee
+    name: Milwaukee
+    state: WI
+    type: city
+  - code: stpaul
+    name: St. Paul
+    state: MN
+    type: city
+  - code: boston
+    name: Boston
+    state: MA
+    type: city
+  - code: providenceri
+    name: Providence
+    state: RI
+    type: city
+  - code: broward
+    name: Broward County
+    state: FL
+    type: county
+  - code: miamidade
+    name: Miami-Dade County
+    state: FL
+    type: county
+  - code: wake
+    name: Wake County
+    state: NC
+    type: county
+  - code: dekalbcountyga
+    name: DeKalb County
+    state: GA
+    type: county
