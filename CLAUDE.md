@@ -1,20 +1,23 @@
 # Abundance Wins Scanner
 
-## Status: v1 built and working, not yet deployed
+## Status: v1 built, deployed, and running on GitHub Actions
 
 The full pipeline (Tier 1 + Tier 2 sources, all three filter stages, digest
 publishing, seen-state dedup, cost logging) is implemented and has been run
 successfully against live APIs multiple times, including real LLM triage/
-summarize calls. What's *not* done yet:
+summarize calls. As of 2026-08-05:
 
-- **Not a git repo.** No `git init`, no commits, no GitHub remote.
-- **`.env` exists locally** with real `LEGISCAN_API_KEY` and `ANTHROPIC_API_KEY`
-  values (gitignored, never commit it). `LEGISTAR_TOKEN` is unset — Legistar's
-  API doesn't require one for the jurisdictions in use.
-- **GitHub Actions workflow file exists** (`.github/workflows/weekly_scan.yml`)
-  but has never run — the repo needs to be pushed to GitHub and
-  `LEGISCAN_API_KEY` / `ANTHROPIC_API_KEY` added as repository secrets before
-  the Monday cron (or a manual `workflow_dispatch`) will work.
+- **Pushed to GitHub**: private repo at
+  `github.com/donjonmaster1/abundance-scanner`, `master` branch.
+- **`.env` exists locally only** with real `LEGISCAN_API_KEY` and
+  `ANTHROPIC_API_KEY` values (gitignored, never commit it). `LEGISTAR_TOKEN`
+  is unset — Legistar's API doesn't require one for the jurisdictions in use.
+- **Repository secrets set**: `LEGISCAN_API_KEY` and `ANTHROPIC_API_KEY` are
+  configured under Settings → Secrets and variables → Actions.
+- **GitHub Actions verified live**: a manual `workflow_dispatch` run
+  (2026-08-05) completed successfully end-to-end in 56s and committed
+  `digests/`, `state/seen.sqlite`, and `state/cost_log.csv` back to `master`.
+  The Monday 13:00 UTC cron should fire on its own from here.
 - Email delivery / static site (v2, optional) — not started.
 
 If you're picking this up fresh: the fastest way to understand the system is
@@ -220,18 +223,19 @@ python -m src.run_weekly --days 7 --dry-run  # sources + keyword filter only, no
 (new keywords, new jurisdictions, source bugs) without spending on Haiku/
 Sonnet calls.
 
-## GitHub Actions setup checklist (not yet done)
+## GitHub Actions setup checklist (done, 2026-08-05)
 
-1. `git init`, commit, create a GitHub repo, push.
-2. Repo Settings → Secrets and variables → Actions → add `LEGISCAN_API_KEY`
-   and `ANTHROPIC_API_KEY`.
-3. Actions tab → "Weekly Abundance Wins Scan" → Run workflow, to trigger a
-   manual test run (`workflow_dispatch` is already wired up in the workflow
-   file).
-4. Confirm the workflow commits `digests/`, `state/seen.sqlite`, and
-   `state/cost_log.csv` back to the repo (it's configured to do this — see
-   the "Commit digest, seen-state, and cost log" step in
-   `.github/workflows/weekly_scan.yml`).
+1. ✅ `git init`, commit, create a GitHub repo, push — private repo at
+   `github.com/donjonmaster1/abundance-scanner`.
+2. ✅ Repo Settings → Secrets and variables → Actions → `LEGISCAN_API_KEY`
+   and `ANTHROPIC_API_KEY` added.
+3. ✅ Actions tab → "Weekly Abundance Wins Scan" → Run workflow — manual
+   `workflow_dispatch` test run completed successfully (run 31026801382,
+   56s).
+4. ✅ Confirmed the workflow commits `digests/`, `state/seen.sqlite`, and
+   `state/cost_log.csv` back to the repo (see the "Commit digest, seen-state,
+   and cost log" step in `.github/workflows/weekly_scan.yml`) — verified via
+   the auto-pushed commit from the test run.
 
 Cost note: `ubuntu-latest` runner, weekly schedule, a few minutes per run —
 free on a public repo (unlimited Actions minutes) and trivially within the
