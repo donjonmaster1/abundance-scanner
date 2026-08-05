@@ -2,4 +2,4 @@
 # Add or remove addresses here, one per line under `subscribers:`.
 # Recipients are sent via BCC, so they never see each other's addresses.
 subscribers:
-  - andrewtegorin@gmail.com
+  - ate20@georgetown.edu
