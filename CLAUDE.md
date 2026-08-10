@@ -172,21 +172,28 @@ code paths.
   (`PRICING` dict) are standard (non-introductory) per-1M-token rates,
   checked 2026-08-05 — re-verify against current Anthropic pricing if this
   file is being revisited long after that date.
-- **`src/publish/email_digest.py`** (added 2026-08-05) — emails the same
-  candidates that go into the markdown digest, as HTML, via the Resend API
-  (`https://api.resend.com/emails`). Recipients come from `subscribers:` in
-  `config/subscribers.yaml` — a plain list of addresses committed to this
-  (private) repo; add/remove addresses by editing that file directly. Sent
-  as a single Resend call with `to` set to `EMAIL_FROM` itself and the real
+- **`src/publish/email_digest.py`** (added 2026-08-05, live as of
+  2026-08-10) — emails the same candidates that go into the markdown
+  digest, as HTML, via the Resend API (`https://api.resend.com/emails`).
+  Recipients come from `subscribers:` in `config/subscribers.yaml` — a
+  plain list of addresses committed to this (private) repo; add/remove
+  addresses by editing that file directly (then commit + push — GitHub
+  Actions reads the pushed repo state, not your local disk). Sent as a
+  single Resend call with `to` set to `EMAIL_FROM` itself and the real
   recipient list in `bcc`, so subscribers never see each other's addresses.
-  Requires `RESEND_API_KEY` and `EMAIL_FROM` — **not yet configured as of
-  2026-08-05** (no Resend account exists yet), so `send_digest_email()`
-  currently no-ops with a printed warning every run. This is by design
-  (best-effort, never raises) so a missing/broken email step can't fail the
-  digest/seen-state/cost-log parts of the run that already succeeded.
-  Set up a Resend account + verified sending domain, then add
-  `RESEND_API_KEY`/`EMAIL_FROM` as both local `.env` values and GitHub repo
-  secrets, to make sending actually work.
+  `EMAIL_FROM` is `digest@scanner.abundancecorps.org` — a subdomain of a
+  domain owned by a collaborator, verified in Resend via DNS records (SPF +
+  DKIM) added by them. Confirmed working with a real test send on
+  2026-08-10. Requires `RESEND_API_KEY` and `EMAIL_FROM`, both set locally
+  in `.env` and as GitHub repo secrets. Best-effort by design (never
+  raises) — a missing/broken email step logs a warning but can't fail the
+  digest/seen-state/cost-log parts of the run.
+  - **Dead end worth knowing about**: Resend's shared sender
+    (`onboarding@resend.com`) cannot be used at all without *some* verified
+    domain — there's no sandbox/test-mode exception that lets it deliver
+    even to a single address. Confirmed via a live 403
+    (`"The resend.com domain is not verified"`). Don't reach for it as a
+    stopgap; a verified domain (or subdomain) is the only path that works.
 
 ## Repo structure (actual)
 
@@ -216,7 +223,7 @@ abundance-scanner/
 │   │   └── summarize.py         # Sonnet pass
 │   └── publish/
 │       ├── digest.py
-│       └── email_digest.py      # Resend email delivery, not yet configured
+│       └── email_digest.py      # Resend email delivery, live as of 2026-08-10
 ├── state/
 │   ├── seen.sqlite               # committed — cross-run dedup state
 │   └── cost_log.csv              # committed — running spend log
@@ -274,9 +281,9 @@ free on a public repo (unlimited Actions minutes) and trivially within the
   output should be capped or re-ranked per jurisdiction if this becomes a
   recurring pattern — not implemented, no strong opinion yet on whether it's
   actually a problem versus just how the data looks.
-- **Email delivery**: code is in place (`src/publish/email_digest.py`,
-  `config/subscribers.yaml`) but there's no Resend account yet, so no email
-  has actually been sent — `RESEND_API_KEY`/`EMAIL_FROM` need to be created
-  and set (locally in `.env` and as GitHub repo secrets) before this does
-  anything. See Stage 3 notes above.
+- **Email delivery**: live as of 2026-08-10, sending from
+  `digest@scanner.abundancecorps.org` (a subdomain of a collaborator-owned
+  domain, verified in Resend). Only one subscriber so far
+  (`ate20@georgetown.edu`) — add more by editing `config/subscribers.yaml`
+  and pushing. See Stage 3 notes above.
 - **Static site (v2)**: out of scope, not started.
