@@ -1,15 +1,32 @@
 # Curated Legistar client codes for Tier 2 municipal sourcing (src/sources/legistar.py).
 #
 # `code` is the Legistar client subdomain, i.e. https://{code}.legistar.com and the Web
-# API base https://webapi.legistar.com/v1/{code}/. Every entry below was verified live
-# against the Web API `bodies` endpoint on 2026-08-05 (returns a JSON array, not an
-# "InSite setting not set up" error) — do not add a code without the same check, since
-# legistar.com resolves 200 for *any* subdomain regardless of validity.
+# API base https://webapi.legistar.com/v1/{code}/. Every entry below passed a two-part
+# live check on the date noted per entry — do not add a code without both:
+#   1. `bodies` endpoint returns a JSON array, not an "InSite setting not set up"
+#      error/500 — legistar.com resolves 200 for *any* subdomain regardless of
+#      validity, and webapi.legistar.com's own error responses (500, or an empty-body
+#      403 for a couple of codes tried) aren't consistent enough to trust without
+#      checking the actual response body.
+#   2. `matters` endpoint (`$orderby=MatterLastModifiedUtc desc, $top=3`, no date
+#      filter) returns at least one *recent* result. Step 1 alone isn't sufficient —
+#      found two 2026-08-15 candidates that passed step 1 but were dead weight:
+#      `atlantaga`'s most recent matter was from 2023 (a stale/abandoned tenant), and
+#      `minneapolismn` had zero matters at all despite a valid, non-empty `bodies`
+#      response. Both were dropped rather than added.
 #
-# Starter set: DC-area jurisdictions + a geographically representative national sample,
-# per CLAUDE.md's open question ("which ~20-50 cities/counties matter most?"). Expand
-# over time — good candidates are places actively passing zoning/permitting/energy-siting
-# reform, not just population-largest cities.
+# Starter set (2026-08-05): DC-area jurisdictions + a geographically representative
+# national sample, per CLAUDE.md's open question ("which ~20-50 cities/counties matter
+# most?"). Expanded 2026-08-15 with 11 more cities/counties, chosen for a mix of
+# geographic spread and known zoning/housing-reform activity — code guessed from
+# common naming patterns (cityname, citynameXX, cityofcityname, etc.) and confirmed
+# live one at a time; guesses that 500'd for every pattern tried were left out, not
+# assumed invalid from a single guess. Some searched-for cities (Cambridge MA,
+# Arlington County VA, Portland OR, San Diego city, Philadelphia, Raleigh/Durham NC,
+# and others) don't appear to run Legistar at all under any guessed code — Cambridge
+# confirmed via web search to run a different platform ("OneMeeting"); the rest just
+# came up empty. Keep expanding over time — good candidates are places actively
+# passing zoning/permitting/energy-siting reform, not just population-largest cities.
 
 dc_area:
   - code: montgomerycountymd
@@ -121,4 +138,51 @@ national_sample:
   - code: dekalbcountyga
     name: DeKalb County
     state: GA
+    type: county
+
+# Verified live 2026-08-15 (see header note above).
+expansion_2026_08:
+  - code: austintexas
+    name: Austin
+    state: TX
+    type: city
+  - code: charlottenc
+    name: Charlotte
+    state: NC
+    type: city
+  - code: sanjose
+    name: San Jose
+    state: CA
+    type: city
+  - code: mesa
+    name: Mesa
+    state: AZ
+    type: city
+  - code: somervillema
+    name: Somerville
+    state: MA
+    type: city
+  - code: madison
+    name: Madison
+    state: WI
+    type: city
+  - code: cincinnatioh
+    name: Cincinnati
+    state: OH
+    type: city
+  - code: cityofcleveland
+    name: Cleveland
+    state: OH
+    type: city
+  - code: baltimore
+    name: Baltimore
+    state: MD
+    type: city
+  - code: jaxcityc
+    name: Jacksonville
+    state: FL
+    type: city
+  - code: sdcounty
+    name: San Diego County
+    state: CA
     type: county

@@ -87,7 +87,7 @@ fetched.
 
 **`src/sources/legistar.py`** — municipal ordinances/resolutions ("matters")
 via the Legistar OData Web API, across the curated jurisdiction list in
-`config/jurisdictions.yaml` (27 client codes, individually verified live
+`config/jurisdictions.yaml` (38 client codes, individually verified live
 against the real Web API — see that file's header for the verification
 method, since `*.legistar.com` returns HTTP 200 for *any* subdomain
 including invalid ones, so HTTP status alone doesn't prove a code is real).
@@ -207,7 +207,7 @@ abundance-scanner/
 ├── requirements.txt
 ├── config/
 │   ├── keywords.yaml
-│   ├── jurisdictions.yaml      # 27 verified Legistar client codes
+│   ├── jurisdictions.yaml      # 38 verified Legistar client codes
 │   └── subscribers.yaml        # digest email mailing list (plain addresses)
 ├── src/
 │   ├── models.py                # Candidate dataclass — the shared pipeline object
@@ -268,14 +268,27 @@ free on a public repo (unlimited Actions minutes) and trivially within the
 
 ## Open questions / things to revisit
 
-- **Jurisdiction list curation**: `config/jurisdictions.yaml` has 27 verified
-  Legistar codes (DC-area + national sample). Prune low-signal ones and add
-  new ones as real-world digest output reveals which jurisdictions actually
-  produce Abundance-relevant matters.
-- **LegiScan status filter** (`PASSED_STATUS_CODES = {3, 4}`): an assumption,
-  not verified against LegiScan's own docs at build time beyond training
-  knowledge. If passed/enacted bills seem to be getting missed, this is the
-  first place to check.
+- **Jurisdiction list curation**: `config/jurisdictions.yaml` has 38 verified
+  Legistar codes (DC-area + national sample, expanded 2026-08-15 with 11
+  more cities/counties — see that file's header for the two-part
+  verification method and two candidates that were checked and rejected).
+  Prune low-signal ones and add new ones as real-world digest output reveals
+  which jurisdictions actually produce Abundance-relevant matters.
+- **LegiScan status filter** (`PASSED_STATUS_CODES = {3, 4}`): **verified
+  correct, 2026-08-15**, via a live `getBill` call against a real bill (CA
+  AB1, a wildfire-insurance bill) rather than trusting secondhand docs,
+  which were inconsistent on this point. Confirmed `status` does advance
+  all the way to `4` once a bill is actually signed and chaptered into
+  law — the response showed `status: 4` alongside
+  `last_action: "Chaptered by Secretary of State - Chapter 472, Statutes of
+  2025."` and a `history` entry `"Approved by the Governor."` immediately
+  before it. So `status=4` is not just "passed a chamber," it's true
+  enactment — this filter is not excluding real wins and is not the
+  explanation for thin digests. (LegiScan's `getBill` response also
+  includes a more granular `progress` array with numeric event codes
+  beyond the coarse 1–6 `status` field, e.g. an event `8` on the same date
+  as the chaptering — unused by this codebase today, but available if
+  finer-grained progress tracking is ever needed.)
 - **`service_provision` triage looseness**: see Stage 2 notes above.
 - **Legistar/Phoenix over-representation**: a single active jurisdiction
   with many small rezonings can dominate a digest. Consider whether digest
