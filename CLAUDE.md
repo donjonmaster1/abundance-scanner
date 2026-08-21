@@ -17,8 +17,9 @@ summarize calls. As of 2026-08-05:
 - **GitHub Actions verified live**: a manual `workflow_dispatch` run
   (2026-08-05) completed successfully end-to-end in 56s and committed
   `digests/`, `state/seen.sqlite`, and `state/cost_log.csv` back to `master`.
-  The Monday 13:00 UTC cron should fire on its own from here.
-- Email delivery / static site (v2, optional) — not started.
+  The Friday 15:00 UTC cron should fire on its own from here.
+- Email delivery is live (see Stage 3 notes below); static site (v2,
+  optional) — not started.
 
 If you're picking this up fresh: the fastest way to understand the system is
 to read this file, then run `python -m src.run_weekly --days 7` (needs
@@ -231,7 +232,7 @@ abundance-scanner/
 │   └── YYYY-MM-DD.md             # one per run date
 └── .github/
     └── workflows/
-        └── weekly_scan.yml       # Saturday 16:00 UTC cron + workflow_dispatch
+        └── weekly_scan.yml       # Friday 15:00 UTC cron + workflow_dispatch
 ```
 
 ## Running it
