@@ -22,14 +22,19 @@ SOURCE_LABELS = {
 
 def _entry_md(c: Candidate) -> str:
     source_label = SOURCE_LABELS.get(c.source, c.source)
-    lines = [
-        f"### {c.title.strip()}",
-        f"- **Jurisdiction:** {c.jurisdiction}",
-        f"- **Source:** [{source_label}]({c.url})",
-        f"- **Status:** {c.status or 'n/a'} (as of {c.date})",
-        f"- **Summary:** {c.summary}",
-        f"- **Why it matters:** {c.significance}",
-    ]
+    lines = [f"### {c.title.strip()}", f"- **Jurisdiction:** {c.jurisdiction}"]
+    if c.grouped_items:
+        lines.append(f"- **Source:** {source_label}, {len(c.grouped_items)} individual actions:")
+        for item in c.grouped_items:
+            lines.append(
+                f"  - [{item.title.strip()}]({item.url}) "
+                f"(status: {item.status or 'n/a'}, {item.date})"
+            )
+    else:
+        lines.append(f"- **Source:** [{source_label}]({c.url})")
+        lines.append(f"- **Status:** {c.status or 'n/a'} (as of {c.date})")
+    lines.append(f"- **Summary:** {c.summary}")
+    lines.append(f"- **Why it matters:** {c.significance}")
     return "\n".join(lines)
 
 
@@ -44,7 +49,11 @@ def build_digest_markdown(candidates: list[Candidate], run_date: str) -> str:
         parts.append("No candidate wins cleared triage this week.")
         return "\n".join(parts) + "\n"
 
-    parts.append(f"{len(candidates)} win(s) this week.")
+    total_wins = sum(len(c.grouped_items) or 1 for c in candidates)
+    if total_wins != len(candidates):
+        parts.append(f"{total_wins} win(s) this week, grouped into {len(candidates)} entries below.")
+    else:
+        parts.append(f"{len(candidates)} win(s) this week.")
     parts.append("")
 
     for category in sorted(by_category, key=lambda k: CATEGORY_LABELS.get(k, k)):

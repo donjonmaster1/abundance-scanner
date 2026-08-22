@@ -29,6 +29,13 @@ class Candidate:
     summary: str = ""
     significance: str = ""
 
+    # populated by group.group_candidates() — when non-empty, this Candidate is a
+    # synthesized stand-in for multiple same-jurisdiction/category triage survivors
+    # (see src/filter/group.py); title/summary/significance describe the group as a
+    # whole rather than any single item, and digest/email rendering lists each of
+    # these individually instead of using this candidate's own url/status/date.
+    grouped_items: list["Candidate"] = field(default_factory=list)
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,

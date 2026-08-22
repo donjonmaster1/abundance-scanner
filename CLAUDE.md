@@ -133,12 +133,35 @@ keyword list — not a bug — but worth knowing if the digest reads as
    (`output_config.format` with a `json_schema`) rather than free-text
    parsing. Returns WIN/NOT + one-line reason per candidate.
 
-3. **`src/filter/summarize.py`** — Claude Sonnet 5 (`claude-sonnet-5`), one
-   call per triage survivor, also structured JSON output. Thinking is
-   explicitly disabled (`thinking: {"type": "disabled"}`) with
-   `effort: "low"` — these are short, well-scoped writing tasks and Sonnet 5
-   thinks by default when `thinking` is omitted, which isn't worth the extra
-   spend here. Do not remove the explicit disable without a reason.
+3. **`src/filter/group.py`** (added 2026-08-21) — runs after triage, before
+   summarize. Buckets triage WIN survivors by (jurisdiction, primary
+   category); any bucket with `GROUP_THRESHOLD` (3) or more items gets
+   collapsed into a single synthesized `Candidate` with `grouped_items`
+   populated, instead of one digest entry per item. This exists because a
+   single active jurisdiction processing many small individual actions in
+   one week (e.g. a city council batch-approving a dozen small rezonings)
+   would otherwise flood the digest and drown out everything else — see
+   "Legistar/Phoenix over-representation" below, which this resolved. A
+   live test right after the 2026-08-15 jurisdiction expansion (see Stage 1
+   notes) found 40 real triage-verified wins in one week, 24 of them
+   near-identical Jacksonville rezonings and 11 Austin ones — grouping
+   collapsed that down to 7 readable digest entries without dropping any
+   underlying win; digest/email output states the true total ("40 win(s)
+   this week, grouped into 7 entries below") so nothing is hidden, just
+   organized. Grouping is purely a presentation-layer step — it runs after
+   `seen_state` dedup already happened on the original individual
+   candidate IDs, so it has no effect on dedup/cost tracking.
+
+4. **`src/filter/summarize.py`** — Claude Sonnet 5 (`claude-sonnet-5`), one
+   call per triage survivor (or per group — `summarize_all()` routes to
+   `summarize_group()` instead of `summarize()` whenever `grouped_items` is
+   populated, using a separate system prompt that asks for one combined
+   summary describing the pattern/scale rather than one entry per item),
+   structured JSON output either way. Thinking is explicitly disabled
+   (`thinking: {"type": "disabled"}`) with `effort: "low"` — these are
+   short, well-scoped writing tasks and Sonnet 5 thinks by default when
+   `thinking` is omitted, which isn't worth the extra spend here. Do not
+   remove the explicit disable without a reason.
 
    **Known soft spot:** the `service_provision` category is the vaguest of
    the four and has let through some fairly minor items (e.g. an agency
@@ -147,10 +170,10 @@ keyword list — not a bug — but worth knowing if the digest reads as
    exclude routine IT/payment-system modernization rather than touching the
    keyword list — the keyword filter did its job correctly in that case.
 
-Both `triage_batch()` and `summarize_all()`/`summarize()` accept an optional
-`cost_tracker: CostTracker` and record token usage via `response.usage` —
-always pass one through from `run_weekly.py`, don't call them bare in new
-code paths.
+`triage_batch()`, `summarize_all()`/`summarize()`/`summarize_group()` all
+accept an optional `cost_tracker: CostTracker` and record token usage via
+`response.usage` — always pass one through from `run_weekly.py`, don't call
+them bare in new code paths.
 
 ### Stage 3: Publishing
 
@@ -290,11 +313,11 @@ free on a public repo (unlimited Actions minutes) and trivially within the
   as the chaptering — unused by this codebase today, but available if
   finer-grained progress tracking is ever needed.)
 - **`service_provision` triage looseness**: see Stage 2 notes above.
-- **Legistar/Phoenix over-representation**: a single active jurisdiction
-  with many small rezonings can dominate a digest. Consider whether digest
-  output should be capped or re-ranked per jurisdiction if this becomes a
-  recurring pattern — not implemented, no strong opinion yet on whether it's
-  actually a problem versus just how the data looks.
+- **Legistar/Phoenix over-representation**: **resolved, 2026-08-21**, by
+  `src/filter/group.py` — see Stage 2 notes above. A single jurisdiction
+  with many small same-category wins now collapses into one grouped digest
+  entry (threshold: 3+) instead of flooding the digest with near-duplicate
+  entries.
 - **Email delivery**: live as of 2026-08-10, sending from
   `digest@scanner.abundancecorps.org` (a subdomain of a collaborator-owned
   domain, verified in Resend). Only one subscriber so far

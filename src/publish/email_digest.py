@@ -32,12 +32,28 @@ def _esc(value) -> str:
 
 def _entry_html(c: Candidate) -> str:
     source_label = SOURCE_LABELS.get(c.source, c.source)
+    if c.grouped_items:
+        items_html = "".join(
+            f'<li><a href="{_esc(item.url)}">{_esc(item.title.strip())}</a> '
+            f"(status: {_esc(item.status or 'n/a')}, {_esc(item.date)})</li>"
+            for item in c.grouped_items
+        )
+        source_block = (
+            f"<p style=\"margin:2px 0;\"><b>Source:</b> {_esc(source_label)}, "
+            f"{len(c.grouped_items)} individual actions:</p>"
+            f'<ul style="margin:2px 0;">{items_html}</ul>'
+        )
+    else:
+        source_block = (
+            f'<p style="margin:2px 0;"><b>Source:</b> {_esc(source_label)}</p>'
+            f'<p style="margin:2px 0;"><b>Status:</b> {_esc(c.status or "n/a")} '
+            f"(as of {_esc(c.date)})</p>"
+        )
     return f"""
     <div style="margin-bottom:20px;">
       <h3 style="margin:0 0 6px;"><a href="{_esc(c.url)}">{_esc(c.title.strip())}</a></h3>
       <p style="margin:2px 0;"><b>Jurisdiction:</b> {_esc(c.jurisdiction)}</p>
-      <p style="margin:2px 0;"><b>Source:</b> {_esc(source_label)}</p>
-      <p style="margin:2px 0;"><b>Status:</b> {_esc(c.status or 'n/a')} (as of {_esc(c.date)})</p>
+      {source_block}
       <p style="margin:8px 0;">{_esc(c.summary)}</p>
       <p style="margin:2px 0;"><i>Why it matters:</i> {_esc(c.significance)}</p>
     </div>"""
@@ -54,7 +70,11 @@ def build_digest_html(candidates: list[Candidate], run_date: str) -> str:
         parts.append("<p>No candidate wins cleared triage this week.</p>")
         return "".join(parts)
 
-    parts.append(f"<p>{len(candidates)} win(s) this week.</p>")
+    total_wins = sum(len(c.grouped_items) or 1 for c in candidates)
+    if total_wins != len(candidates):
+        parts.append(f"<p>{total_wins} win(s) this week, grouped into {len(candidates)} entries below.</p>")
+    else:
+        parts.append(f"<p>{len(candidates)} win(s) this week.</p>")
     for category in sorted(by_category, key=lambda k: CATEGORY_LABELS.get(k, k)):
         label = CATEGORY_LABELS.get(category, category.replace("_", " ").title())
         entries = sorted(by_category[category], key=lambda c: c.date, reverse=True)

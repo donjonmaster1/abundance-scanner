@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from dotenv import load_dotenv
 
 from src.cost_log import CostTracker
+from src.filter.group import group_candidates
 from src.filter.keyword_filter import filter_candidates
 from src.filter.summarize import summarize_all
 from src.filter.triage import triage_batch
@@ -80,11 +81,15 @@ def run(days: int = 7, dry_run: bool = False) -> None:
         triage_survivors = triage_batch(keyword_survivors, cost_tracker=cost_tracker)
         print(f"[run_weekly] {len(triage_survivors)} survive Haiku triage")
 
-        summarize_all(triage_survivors, cost_tracker=cost_tracker)
+        digest_entries = group_candidates(triage_survivors)
+        if len(digest_entries) != len(triage_survivors):
+            print(f"[run_weekly] grouped into {len(digest_entries)} digest entries")
 
-        digest_path = write_digest(triage_survivors, run_date)
+        summarize_all(digest_entries, cost_tracker=cost_tracker)
+
+        digest_path = write_digest(digest_entries, run_date)
         print(f"[run_weekly] digest written to {digest_path}")
-        send_digest_email(triage_survivors, run_date)
+        send_digest_email(digest_entries, run_date)
 
         # Mark every keyword survivor seen (not just triage winners) so rejected
         # items aren't re-spent on next week.
