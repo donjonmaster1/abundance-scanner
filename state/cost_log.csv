@@ -25,3 +25,5 @@ run_date,model,input_tokens,output_tokens,cost_usd,running_total_usd
 2026-10-09,claude-sonnet-5,3883,902,0.025179,0.630770
 2026-10-16,claude-haiku-4-5,3416,898,0.007906,0.638676
 2026-10-16,claude-sonnet-5,5064,1330,0.035142,0.673818
+2026-10-23,claude-haiku-4-5,7993,1200,0.013993,0.687811
+2026-10-23,claude-sonnet-5,5055,1286,0.034455,0.722266
